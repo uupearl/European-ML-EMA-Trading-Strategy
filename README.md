@@ -69,3 +69,12 @@ See [`SLIDE_CODE_MAP.md`](SLIDE_CODE_MAP.md) for the full 27-slide mapping and i
 The two Python files were executed in an isolated copy of this ZIP. All **13 numerical result CSV files** matched the submitted values within floating point tolerance (maximum absolute discrepancy approximately 7.5e-14), and all **14 figures** regenerated successfully. This verifies computational reproducibility from the included input CSV, **not** the original market-data provenance or all backtest assumptions.
 
 The present repository copy contains a validated reproducibility reference and the updated 13-slide partial deck (slides 14–26). The closing page will be duplicated from the front group’s cover; the merged group-final presentation is **not yet** available. The Q icons and GitHub URL placeholder in the PPT do not have working hyperlinks until the public repository link is inserted.
+
+
+## Group Members
+
+- Xuanyu Chen
+- Wei Li
+- Lusi Huang
+- Fandi Lyu
+- Rui Mo
