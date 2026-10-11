@@ -1,0 +1,12 @@
+ETFs: 10
+Rows: 12550
+Top features: ['intraday_return', 'overnight_gap', 'ret_1d', 'ret_5d', 'macd_hist_pct']
+Tuned threshold: 0.59
+Portfolio: gross_normalized
+
+                             Total Return  Sharpe Ratio  Maximum Drawdown
+EqualWeight_DailyRebalanced       0.45120       2.30572          -0.14314
+Traditional_EMA                   0.01620       0.18526          -0.18178
+ML_EMA_Fixed_058                  0.18455       1.68809          -0.02359
+ML_EMA_Tuned_0.59                 0.18444       1.72126          -0.01993
+ML_EMA_Dynamic_Q90                0.25564       1.77359          -0.06406

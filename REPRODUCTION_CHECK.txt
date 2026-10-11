@@ -1,0 +1,4 @@
+Rerun status (2026-10-11): both Python scripts exited 0; 13/13 result CSVs matched prior supplied outputs within floating-point numerical tolerance; 14 figures generated.
+Raw data contains 12,550 rows. Tuned strategy weight matrix has 34 nonzero gross exposure days of 249.
+
+Notes: This verification does not independently establish original market data provenance/licensing or real executable backtest fills.
