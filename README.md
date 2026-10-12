@@ -1,24 +1,53 @@
 # Machine Learning-Enhanced EMA Trading Strategy in European Equity Markets
 
-**DEDA group project | 2021–2025 daily data | 10 European-country equity ETFs**
+**DEDA Group Project | School of Economics, Fudan University | 2026**  
+**Data:** Daily observations for 10 US-listed European-country equity ETFs, 2021–2025
 
-This repository contains the source code, supplied input dataset, model outputs, and research figures for our study of a Random Forest confidence filter applied to a traditional EMA(10, 50) crossover strategy. The assets track **US-listed ETFs representing European national equity markets**, not necessarily stocks listed on European exchanges.
+## Group Members
 
-## Quick navigation
+Xuanyu Chen · Wei Li · Lusi Huang · Fandi Lyu · Rui Mo
 
-| Folder / file | Contents |
+## Project Overview
+
+This project investigates whether a **Random Forest (RF) confidence filter** can improve a traditional **EMA(10, 50) crossover trading strategy** in European equity markets. We construct technical indicators from daily ETF market data, estimate the probability of positive next-day returns, and use that probability to filter EMA-generated trading signals. We compare the resulting strategies with an unfiltered EMA strategy and an equal-weight ETF benchmark.
+
+The sample consists of **10 US-listed ETFs tracking European national equity markets**. Their USD-denominated returns should not be interpreted as local-currency returns on the underlying European indices.
+
+## Methodology
+
+1. **Data and features:** Process daily price and volume data and construct 25 technical indicators covering momentum, mean reversion, trends, volatility, and trading activity.
+2. **Model training:** Train Random Forest classifiers and select the five most important features using the 2021–2023 training data.
+3. **Validation:** Use 2024 data to choose a confidence threshold without tuning on the test sample.
+4. **Trading signals:** Use EMA(10, 50) to determine long/short direction and RF probabilities to filter signals. Compare a fixed **0.58** threshold, a validation-selected **0.59** threshold, and a dynamic rolling **90th-percentile** threshold.
+5. **Backtesting:** Evaluate the strategies on the held-out **2025** sample using return and risk metrics, including transaction-cost sensitivity and a strict dollar-neutral robustness check.
+
+## Out-of-Sample Results (2025)
+
+| Strategy | Total Return | Sharpe Ratio | Maximum Drawdown |
+| --- | ---: | ---: | ---: |
+| Equal-weight ETF benchmark | 45.12% | 2.31 | -14.31% |
+| Traditional EMA | 1.62% | 0.19 | -18.18% |
+| RF-filtered EMA: fixed 0.58 | 18.46% | 1.69 | -2.36% |
+| RF-filtered EMA: tuned 0.59 | 18.44% | 1.72 | -1.99% |
+| RF-filtered EMA: dynamic Q90 | 25.56% | 1.77 | -6.41% |
+
+The RF-filtered strategies improved several risk-adjusted metrics relative to traditional EMA, but **did not outperform the equal-weight benchmark in total return**. Predictive discrimination remained limited: ETF-level test AUC values were approximately **0.47–0.56**.
+
+## Repository Structure
+
+| Path | Description |
 | --- | --- |
-| [`Code/European_ML_EMA_Concise.py`](Code/European_ML_EMA_Concise.py) | Load data; engineer 25 features; train/evaluate Random Forest; select confidence threshold; generate signals; backtest strategies; save core results |
-| [`Code/Generate_Research_Figures.py`](Code/Generate_Research_Figures.py) | Read core results; generate 14 research figures; analyze transaction-cost and strict dollar-neutral robustness |
-| [`Data/European_ETF_Daily_2021_2025.csv`](Data/European_ETF_Daily_2021_2025.csv) | Supplied daily OHLCV/adjusted-price input (10 ETFs, 2021–2025) |
-| [`Results/`](Results/) | 13 CSV results, a run summary, and 14 PNG figures |
-| [`SLIDE_CODE_MAP.md`](SLIDE_CODE_MAP.md) | **Mapping from presentation slide numbers to source code and results** |
-| [`Presentation/`](Presentation/) | Reference 31-slide outline **and the clean, editable slides 14–26 with speaker notes**; not yet a merged group-final presentation. |
-| [`requirements.txt`](requirements.txt) | Python dependencies |
+| `Presentation/` | Project presentation |
+| `Code/European_ML_EMA_Concise.py` | Feature engineering, RF modeling, signal construction, and backtesting |
+| `Code/Generate_Research_Figures.py` | Research figures and additional robustness analysis |
+| `Data/European_ETF_Daily_2021_2025.csv` | Input daily ETF dataset |
+| `Results/` | Model outputs, strategy performance tables, and daily portfolio results |
+| `Results/Figures/` | 14 research figures |
+| `requirements.txt` | Python dependencies |
 
-## How to reproduce
+## Reproducibility
 
-In a terminal, change to this repository's root directory and run:
+From the repository root, run:
 
 ```bash
 python3 -m pip install -r requirements.txt
@@ -26,55 +55,5 @@ python3 Code/European_ML_EMA_Concise.py
 python3 Code/Generate_Research_Figures.py
 ```
 
-The **order matters**: the figure script reads core CSV outputs created by the model script. Both scripts use paths relative to their own locations. No manual editing of Mac/Windows user paths is needed.
+Run the scripts **in this order**: the visualization script uses outputs produced by the main analysis script. Data paths are relative to the repository structure; no local machine-specific paths are required.
 
-The input ETF CSV is **already provided**. This repository reproduces the results *from that CSV*; it does not include a script to download/verify the original market data source. Training results and plots may differ slightly with library versions/platforms. The threshold selected by the supplied run is 0.59, and some figure annotations refer to that threshold explicitly.
-
-### Experimental design
-
-- Train / feature ranking: 2021–2023; threshold validation: 2024; held-out out-of-sample backtest: 2025.
-- Features: 25 technical indicators; Random Forest uses 300 trees (max depth 6; minimum leaf size 12), with top five selected by training-only feature importance.
-- Signal: EMA(10/50) supplies long/short direction; RF supplies a direction-aware confidence estimate.
-- Filter rules: fixed 0.58; validation-selected 0.59; and ETF-specific dynamic rolling 90th percentile based on past confidence scores.
-- Strategies: equal-weight buy-and-hold-style daily-rebalanced benchmark, unfiltered EMA, and three RF-filtered EMA rules.
-- Main portfolio: gross exposure normalized to 1 when active, **not** constrained to be dollar neutral.
-- Main EMA strategies assume 5 bps one-way transaction cost per unit of turnover; **equal-weight benchmark does not deduct transaction costs**.
-
-### Reading results responsibly
-
-The RF test AUC is close to random (roughly 0.47–0.56). In the supplied 2025 historical backtest, filtered EMA improved several risk measures relative to unfiltered EMA, but **none beat the equal-weight benchmark on total return**. The strict dollar-neutral check leaves the filtered strategies with only 1–2 nonzero-trading days; its near-zero returns must not be interpreted as evidence of a robust, actively deployed neutral strategy.
-
-This is a historical backtest and educational analysis, **not live trading or investment advice**. Data redistribution rights and provenance should be confirmed before publishing the input dataset publicly.
-
-## Summary of results files
-
-| File | Use |
-| --- | --- |
-| `feature_importance.csv` | Ranked Random Forest features (slide 14) |
-| `auc_by_ticker.csv` | 2024 validation and 2025 test AUC by ETF (slide 15) |
-| `threshold_tuning_2024.csv` | 2024 threshold-versus-Sharpe evidence (slide 18) |
-| `test_2025_predictions_and_signals.csv` | RF probabilities, EMA direction, confidence, filtered signals (slides 16–20) |
-| `weights_*.csv` | Portfolio weights by strategy (slides 19–20, 24–25) |
-| `portfolio_daily_returns_2025.csv` | 2025 wealth and drawdown paths (slides 21, 23) |
-| `performance_summary_2025.csv` | Return, risk, turnover, drawdown and Sharpe (slide 22) |
-| `transaction_cost_sensitivity_2025.csv` | 0/5/10/20 bps robustness (slide 24) |
-| `strict_dollar_neutral_robustness_2025.csv` | Strict neutrality check including trading days (slide 25) |
-| `return_correlation_2021_2025.csv` | ETF return correlations (slide 8) |
-| `run_summary.txt` | Short reproducibility summary |
-
-See [`SLIDE_CODE_MAP.md`](SLIDE_CODE_MAP.md) for the full 27-slide mapping and image names.
-
-## Verified reproduction and presentation handoff
-
-The two Python files were executed in an isolated copy of this ZIP. All **13 numerical result CSV files** matched the submitted values within floating point tolerance (maximum absolute discrepancy approximately 7.5e-14), and all **14 figures** regenerated successfully. This verifies computational reproducibility from the included input CSV, **not** the original market-data provenance or all backtest assumptions.
-
-The present repository copy contains a validated reproducibility reference and the updated 13-slide partial deck (slides 14–26). The closing page will be duplicated from the front group’s cover; the merged group-final presentation is **not yet** available. The Q icons and GitHub URL placeholder in the PPT do not have working hyperlinks until the public repository link is inserted.
-
-
-## Group Members
-
-- Xuanyu Chen
-- Wei Li
-- Lusi Huang
-- Fandi Lyu
-- Rui Mo
